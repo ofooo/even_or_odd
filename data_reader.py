@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, Dataset
 
 def make_data(train_num, test_num, dim=32):
     # 生成数据，dim是数值位数
-    max_value = 2 ** dim - 1
+    max_value = 2 ** (dim - 1)
     total = train_num + test_num
     assert max_value > total
     print(f'max_value={max_value}')
@@ -49,5 +49,5 @@ class MyDataSet(Dataset):
 
 
 if __name__ == '__main__':
-    # 生成训练数据1000条， 测试数据2000条
-    make_data(1000, 2000, dim=32)
+    # 生成训练
+    make_data(1000, 20000, dim=32)

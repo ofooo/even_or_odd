@@ -41,31 +41,32 @@ class Model(nn.Module):
 def train():
     config = Config()
     model = Model(config)
-    dataset = data_reader.MyDataSet()
-    dataloader = data_reader.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
+    trainset = data_reader.MyDataSet()
+    traindata = data_reader.DataLoader(trainset, batch_size=config.batch_size, shuffle=True)
+    testset = data_reader.MyDataSet('test')
+    testdata = data_reader.DataLoader(testset, batch_size=config.batch_size, shuffle=True)
     loss_fn = torch.nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters())
     for epoch in range(config.max_epoch):
-        for i, (x, gold) in enumerate(dataloader):
+        for i, (x, gold) in enumerate(traindata):
             optim.zero_grad()
             y = model(x)
             loss = loss_fn(y, gold)
             loss.backward()
             optim.step()
-            if i % config.print_loss == 0 or i == len(dataloader) - 1:
+            if i % config.print_loss == 0 or i == len(traindata) - 1:
                 batch_size = x.size(0)
                 acc = (gold == model.predict(x)).sum()
                 print(f'epoch={epoch}  i={i}  loss={loss.item():0.4f}  训练集acc={acc.item() / batch_size}')
-    testset = data_reader.MyDataSet('test')
-    testdata = data_reader.DataLoader(testset, batch_size=config.batch_size, shuffle=True)
-    total = 0
-    right = 0
-    model.eval()
-    with torch.no_grad():
-        for x, gold in tqdm(testdata, total=len(testdata)):
-            total += x.size(0)
-            right += (gold == model.predict(x)).sum().item()
-    print(f'\nepoch={config.max_epoch}  测试集acc={right / total}')
+
+        total = 0
+        right = 0
+        model.eval()
+        with torch.no_grad():
+            for x, gold in tqdm(testdata, total=len(testdata)):
+                total += x.size(0)
+                right += (gold == model.predict(x)).sum().item()
+        print(f'\nepoch={epoch}  测试集acc={right / total}')
 
 
 if __name__ == '__main__':
