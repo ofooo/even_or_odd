@@ -9,6 +9,7 @@ class Config:
     emb_dim = 5
     hidden_dim = 5
     lstm_layers = 1
+    bidirectional = False
 
     max_epoch = 20
     print_loss = 50
@@ -20,8 +21,9 @@ class Model(nn.Module):
         super().__init__()
         self.emb = nn.Embedding(2, config.emb_dim)
         self.lstm = nn.LSTM(input_size=config.emb_dim, hidden_size=config.hidden_dim, num_layers=config.lstm_layers,
-                            bidirectional=True, batch_first=True, bias=True)
-        self.linear = nn.Linear(config.hidden_dim * 2, 2)
+                            bidirectional=config.bidirectional, batch_first=True, bias=True)
+        is_bi = 2 if config.bidirectional else 1
+        self.linear = nn.Linear(config.hidden_dim * is_bi, 2)
 
     def forward(self, x):
         x = self.emb(x)
