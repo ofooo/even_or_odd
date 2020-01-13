@@ -5,21 +5,20 @@ from tqdm import tqdm
 
 
 class Config:
-    num_dim = 32
     emb_dim = 5
     hidden_dim = 5
     lstm_layers = 1
     bidirectional = False
 
-    max_epoch = 20
-    print_loss = 50
+    max_epoch = 60
+    print_loss = 5000
     batch_size = 100
 
 
 class Model(nn.Module):
     def __init__(self, config=Config()):
         super().__init__()
-        self.emb = nn.Embedding(2, config.emb_dim)
+        self.emb = nn.Embedding(11, config.emb_dim)
         self.lstm = nn.LSTM(input_size=config.emb_dim, hidden_size=config.hidden_dim, num_layers=config.lstm_layers,
                             bidirectional=config.bidirectional, batch_first=True, bias=True)
         is_bi = 2 if config.bidirectional else 1
@@ -41,9 +40,9 @@ class Model(nn.Module):
 def train():
     config = Config()
     model = Model(config)
-    trainset = data_reader.MyDataSet()
+    trainset = data_reader.TextDataSet()
     traindata = data_reader.DataLoader(trainset, batch_size=config.batch_size, shuffle=True)
-    testset = data_reader.MyDataSet('test')
+    testset = data_reader.TextDataSet('test')
     testdata = data_reader.DataLoader(testset, batch_size=config.batch_size, shuffle=True)
     loss_fn = torch.nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters())
@@ -74,6 +73,11 @@ if __name__ == '__main__':
     train()
 
     """
+    使用二进制数据：
     epoch=10  测试集acc=0.876
     epoch=20  测试集acc=1.0
+    
+    使用文本数据：
+    epoch=10  测试集acc=0.853
+    epoch=30  测试集acc=1.0
     """
